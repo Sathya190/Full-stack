@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html ng-app="todoApp">
+<head>
+<meta charset="UTF-8">
+<title>TaskMaster Hub</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<style>
+body{
+ margin:0;
+ font-family: 'Poppins', sans-serif;
+ background: #ffffff;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ height:100vh;
+ color:#333;
+}
+.container{
+ width:500px;
+ background:#f4f6fb;
+ border-radius:20px;
+ padding:30px;
+ box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+.title{
+ text-align:center;
+ font-size:28px;
+ font-weight:700;
+ margin-bottom:20px;
+ color:#2575fc;
+}
+.input-area{
+ display:flex;
+ gap:10px;
+}
+.input-area input{
+ flex:1;
+ padding:12px;
+ border:1px solid #ddd;
+ border-radius:30px;
+ outline:none;
+ font-size:14px;
+}
+.input-area button{
+ padding:12px 18px;
+ border:none;
+ border-radius:30px;
+ background:#2575fc;
+ color:white;
+ font-weight:600;
+ cursor:pointer;
+ transition:0.3s;
+}
+.input-area button:hover{
+ background:#1a5ed9;
+}
+.counter{
+ margin:15px 0;
+ text-align:center;
+ font-size:14px;
+ color:#555;
+}
+.task-card{
+ background:#ffffff;
+ padding:12px 15px;
+ border-radius:15px;
+ display:flex;
+ align-items:center;
+ margin-bottom:10px;
+ box-shadow:0 5px 15px rgba(0,0,0,0.05);
+ transition:0.2s;
+}
+.task-card:hover{
+ transform:scale(1.02);
+}
+.task-card span{
+ flex:1;
+ margin-left:10px;
+}
+.completed{
+ text-decoration:line-through;
+ opacity:0.6;
+}
+.delete-btn{
+ background:#ff4b5c;
+ border:none;
+ padding:6px 12px;
+ border-radius:20px;
+ color:white;
+ cursor:pointer;
+ font-size:12px;
+}
+.delete-btn:hover{
+ background:#e63b4c;
+}
+.filters{
+ text-align:center;
+ margin-top:15px;
+}
+.filters button{
+ margin:5px;
+ padding:6px 14px;
+ border:none;
+ border-radius:20px;
+ background:#e3e8ff;
+ color:#333;
+ cursor:pointer;
+ font-size:12px;
+ transition:0.3s;
+}
+.filters button:hover{
+ background:#2575fc;
+ color:white;
+}
+</style>
+</head>
+<body ng-controller="todoCtrl">
+<div class="container">
+ <div class="title">TaskMaster Hub</div>
+ <div class="input-area">
+ <input type="text" ng-model="newTask" placeholder="Add new task...">
+ <button ng-click="add()">Add</button>
+ </div>
+ <div class="counter">
+ {{remaining()}} pending / {{tasks.length}} total
+ </div>
+ <div ng-repeat="t in tasks | filter:{done:status}" class="task-card">
+ <input type="checkbox" ng-model="t.done">
+ <span ng-class="{'completed':t.done}">
+ {{t.name}}
+ </span>
+ <button class="delete-btn" ng-click="remove($index)">X</button>
+ </div>
+ <div class="filters">
+ <button ng-click="status=''">All</button>
+ <button ng-click="status=false">Pending</button>
+ <button ng-click="status=true">Completed</button>
+ </div>
+</div>
+<script>
+angular.module("todoApp",[])
+.controller("todoCtrl",function($scope){
+$scope.tasks=[
+{name:"Front end developing",done:false},
+{name:"Deploy website",done:true}
+];
+$scope.add=function(){
+if($scope.newTask){
+ $scope.tasks.push({name:$scope.newTask,done:false});
+ $scope.newTask="";
+}
+};
+$scope.remove=function(i){
+$scope.tasks.splice(i,1);
+};
+$scope.remaining=function(){
+return $scope.tasks.filter(t=>!t.done).length;
+};
+});
+</script>
+</body>
+</html
