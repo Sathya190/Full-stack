@@ -1,0 +1,91 @@
+EX-5
+BMI.JS
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
+const PORT = 3000;
+const DATA_FILE = path.join(__dirname, "data.json");
+const PUBLIC_DIR = path.join(__dirname, "public");
+// Initialize data.json if it doesn't exist
+if (!fs.existsSync(DATA_FILE)) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2));
+}
+const server = http.createServer((req, res) => {
+    // 1. ROUTE: Save Patient Record (POST /save)
+    if (req.method === "POST" && req.url === "/save") {
+        let body = "";
+        req.on("data", chunk => { body += chunk.toString(); })
+        req.on("end", () => {
+            const record = JSON.parse(body);
+            record.date = new Date().toLocaleString();
+
+            fs.readFile(DATA_FILE, "utf8", (err, data) => {
+                const records = JSON.parse(data || "[]");
+                records.unshift(record);
+
+                fs.writeFile(DATA_FILE, JSON.stringify(records, null, 2), (err) => {
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify({ success: true }));
+                    console.log(`Record saved for: ${record.name}`);
+                });
+            });
+        });
+    }
+   
+    // 2. ROUTE: Serve Static Files (GET / and others)
+    else if (req.method === "GET") {
+        let filePath = path.join(PUBLIC_DIR, req.url === "/" ? "index.html" : req.url);
+        const extname = path.extname(filePath);
+       
+        const contentTypes = {
+            ".html": "text/html",
+            ".css": "text/css",
+            ".js": "text/javascript"
+        };
+
+        fs.readFile(filePath, (err, content) => {
+            if (err) {
+                res.writeHead(404);
+                res.end("File Not Found");
+            } else {
+                res.writeHead(200, { "Content-Type": contentTypes[extname] || "text/plain" });
+                res.end(content);
+            }
+        });
+    }
+});
+
+server.listen(PORT, () => {
+    console.log(`http://localhost:${PORT}`);
+});
+Data.Json
+[
+  {
+    "name": "sathya",
+    "bmi": "19.2",
+    "category": "Normal",
+    "age": "20",
+    "weight": 45,
+    "height": "153",
+    "date": "3/17/2026, 10:57:58 AM"
+  },
+  {
+    "name": "sathya",
+    "bmi": "19.2",
+    "category": "Normal",
+    "age": "34",
+    "weight": 45,
+    "height": "153",
+    "date": "3/17/2026, 10:50:48 AM"
+  },
+  {
+    "name": "sathya",
+    "bmi": "21.0",
+    "category": "Normal",
+    "age": "26",
+    "weight": 60,
+    "height": "169",
+    "date": "3/17/2026, 10:49:57 AM"
+  }
+]
+
